@@ -18,6 +18,10 @@ type HttpGet struct {
 	StatusCode int
 }
 
+func (hget *HttpGet) Url(url string) {
+	hget.url = url
+}
+
 func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
 	req, err := http.NewRequest("GET", hget.url, nil)
 	if err != nil {
