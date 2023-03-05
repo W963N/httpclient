@@ -1,6 +1,7 @@
 package httpclient
 
 import (
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 	"time"
 )
 
-type HttpGet struct {
+type HttpsGet struct {
 	url     string
 	query   url.Values
 	request *http.Request
@@ -20,7 +21,7 @@ type HttpGet struct {
 	duration time.Duration
 }
 
-type HttpPost struct {
+type HttpsPost struct {
 	url     string
 	body    url.Values
 	request *http.Request
@@ -31,75 +32,75 @@ type HttpPost struct {
 	duration time.Duration
 }
 
-func (hget *HttpGet) Init(url string, duration time.Duration, query url.Values) {
+func (hget *HttpsGet) Init(url string, duration time.Duration, query url.Values) {
 	hget.url = url
 	hget.query = query
 	hget.duration = duration
 }
 
-func (hpst *HttpPost) Init(url string, duration time.Duration, body url.Values) {
+func (hpst *HttpsPost) Init(url string, duration time.Duration, body url.Values) {
 	hpst.url = url
 	hpst.body = body
 	hpst.duration = duration
 }
 
-func (hget *HttpGet) Url() string {
+func (hget *HttpsGet) Url() string {
 	return hget.url
 }
 
-func (hpst *HttpPost) Url() string {
+func (hpst *HttpsPost) Url() string {
 	return hpst.url
 }
 
-func (hget *HttpGet) Status() string {
+func (hget *HttpsGet) Status() string {
 	return hget.status
 }
 
-func (hpst *HttpPost) Status() string {
+func (hpst *HttpsPost) Status() string {
 	return hpst.status
 }
 
-func (hget *HttpGet) StatusCode() int {
+func (hget *HttpsGet) StatusCode() int {
 	return hget.statusCode
 }
 
-func (hpst *HttpPost) StatusCode() int {
+func (hpst *HttpsPost) StatusCode() int {
 	return hpst.statusCode
 }
 
-func (hget *HttpGet) Duration() time.Duration {
+func (hget *HttpsGet) Duration() time.Duration {
 	return hget.duration
 }
 
-func (hpst *HttpPost) Duration() time.Duration {
+func (hpst *HttpsPost) Duration() time.Duration {
 	return hpst.duration
 }
 
-func (hget *HttpGet) SetUrl(url string) {
+func (hget *HttpsGet) SetUrl(url string) {
 	hget.url = url
 }
 
-func (hpst *HttpPost) SetUrl(url string) {
+func (hpst *HttpsPost) SetUrl(url string) {
 	hpst.url = url
 }
 
-func (hget *HttpGet) SetQuery(query url.Values) {
+func (hget *HttpsGet) SetQuery(query url.Values) {
 	hget.query = query
 }
 
-func (hpst *HttpPost) SetBody(body url.Values) {
+func (hpst *HttpsPost) SetBody(body url.Values) {
 	hpst.body = body
 }
 
-func (hget *HttpGet) SetDuration(duration time.Duration) {
+func (hget *HttpsGet) SetDuration(duration time.Duration) {
 	hget.duration = duration
 }
 
-func (hpst *HttpPost) SetDuration(duration time.Duration) {
+func (hpst *HttpsPost) SetDuration(duration time.Duration) {
 	hpst.duration = duration
 }
 
-func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
+func (hget *HttpsGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
 	geturl := ""
 	if hget.query.Encode() == "" {
 		geturl = hget.url
@@ -110,7 +111,7 @@ func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
-	if u.Scheme != "http" {
+	if u.Scheme != "https" {
 		return nil, errors.New("Scheme Format error")
 	}
 	geturl = u.Scheme + "://" + u.Host + u.Path
@@ -123,7 +124,11 @@ func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error
 	hget.createReqHeader(gh, rqh)
 
 	client := new(http.Client)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{ServerName: u.Hostname()},
+	}
 	client.Timeout = hget.duration
+	client.Transport = tr
 
 	resp, err := client.Do(hget.request)
 	if err != nil {
@@ -140,7 +145,7 @@ func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error
 	return byteArray, nil
 }
 
-func (hget *HttpGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
+func (hget *HttpsGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
 	hget.request.Header.Set(PRAGMA, gh.Pragma())
 	hget.request.Header.Set(CONNECTION, gh.Connection())
 	hget.request.Header.Set(CACHE_CONTROL, gh.CacheControl())
@@ -153,12 +158,12 @@ func (hget *HttpGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
 	hget.request.Header.Set(CONTENT_TYPE, rqh.ContentType())
 }
 
-func (hpst *HttpPost) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
+func (hpst *HttpsPost) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
 	u, err := url.Parse(hpst.url)
 	if err != nil {
 		return nil, err
 	}
-	if u.Scheme != "http" {
+	if u.Scheme != "https" {
 		return nil, errors.New("Scheme Format error")
 	}
 	posturl := u.Scheme + "://" + u.Host + u.Path
@@ -171,7 +176,11 @@ func (hpst *HttpPost) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, erro
 	hpst.createReqHeader(gh, rqh)
 
 	client := new(http.Client)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{ServerName: u.Hostname()},
+	}
 	client.Timeout = hpst.duration
+	client.Transport = tr
 
 	resp, err := client.Do(hpst.request)
 	if err != nil {
@@ -188,7 +197,7 @@ func (hpst *HttpPost) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, erro
 	return byteArray, nil
 }
 
-func (hpst *HttpPost) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
+func (hpst *HttpsPost) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
 	hpst.request.Header.Set(PRAGMA, gh.Pragma())
 	hpst.request.Header.Set(CONNECTION, gh.Connection())
 	hpst.request.Header.Set(CACHE_CONTROL, gh.CacheControl())

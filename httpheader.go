@@ -57,16 +57,19 @@ const (
 	REFERER        = "Referer"
 	USER_AGENT     = "User-Agent"
 	AUTHORIZATION  = "Authorization"
+	CONTENT_TYPE   = "Content-Type"
 )
 
 const (
-	UTF8                  = "utf-8"
-	MIME_TYPE_TEXT        = "text"
-	MIME_TYPE_APPLICATION = "application"
-	MIME_SUBTYPE_HTML     = "html"
-	MIME_SUBTYPE_JSON     = "json"
-	MIME_SUBTYPE_CSV      = "csv"
-	MIME_SUBTYPE_PLAIN    = "plain"
+	UTF8                    = "utf-8"
+	MIME_TYPE_TEXT          = "text"
+	MIME_TYPE_APPLICATION   = "application"
+	MIME_SUBTYPE_HTML       = "html"
+	MIME_SUBTYPE_JSON       = "json"
+	MIME_SUBTYPE_CSV        = "csv"
+	MIME_SUBTYPE_PLAIN      = "plain"
+	MIME_SUBTYPE_URLENCODED = "x-www-form-urlencoded"
+	MIME_SUBTYPE_JS         = "javascript"
 )
 
 var user_agent = "Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion"
@@ -78,6 +81,7 @@ type RequestHeader struct {
 	referer       string
 	userAgent     string
 	authorization string
+	contentType   string
 }
 
 func (rqh *RequestHeader) Accept() string {
@@ -98,6 +102,10 @@ func (rqh *RequestHeader) Referer() string {
 
 func (rqh *RequestHeader) UserAgent() string {
 	return rqh.userAgent
+}
+
+func (rqh *RequestHeader) ContentType() string {
+	return rqh.contentType
 }
 
 func (rqh *RequestHeader) Authorization() string {
@@ -124,34 +132,58 @@ func (rqh *RequestHeader) SetUserAgent(useragent string) {
 	rqh.userAgent = useragent
 }
 
+func (rqh *RequestHeader) SetContentType(contenttype string) {
+	rqh.contentType = contenttype
+}
+
 func (rqh *RequestHeader) SetAuthorization(authorization string) {
 	rqh.authorization = authorization
 }
 
 func (rqh *RequestHeader) Init() {
-	mt := []mimeType{
-		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_PLAIN},
-		{Type: MIME_TYPE_APPLICATION, Subtype: MIME_SUBTYPE_JSON},
-		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_HTML},
-		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_CSV},
+	mt := []MimeType{
+		{mType: MIME_TYPE_TEXT, mSubtype: MIME_SUBTYPE_PLAIN},
+		{mType: MIME_TYPE_APPLICATION, mSubtype: MIME_SUBTYPE_JSON},
+		{mType: MIME_TYPE_TEXT, mSubtype: MIME_SUBTYPE_HTML},
+		{mType: MIME_TYPE_TEXT, mSubtype: MIME_SUBTYPE_CSV},
+		{mType: MIME_TYPE_TEXT, mSubtype: MIME_SUBTYPE_JS},
 	}
-	rqh.accept = rqh.CreateAccept(mt)
+	rqh.accept = rqh.createMimetype(mt)
 	rqh.acceptCharset = UTF8
 	rqh.from = ""
 	rqh.referer = ""
+	rqh.contentType = rqh.createMimetype([]MimeType{
+		{mType: MIME_TYPE_APPLICATION, mSubtype: MIME_SUBTYPE_URLENCODED},
+	})
 	rqh.userAgent = user_agent
 }
 
-type mimeType struct {
-	Type    string
-	Subtype string
+type MimeType struct {
+	mType    string
+	mSubtype string
 }
 
-func (rqh *RequestHeader) CreateAccept(mimetype []mimeType) string {
+func (m *MimeType) Type() string {
+	return m.mType
+}
+
+func (m *MimeType) Subtype() string {
+	return m.mSubtype
+}
+
+func (m *MimeType) SetType(mType string) {
+	m.mType = mType
+}
+
+func (m *MimeType) SetSubtype(mSubtype string) {
+	m.mSubtype = mSubtype
+}
+
+func (rqh *RequestHeader) createMimetype(mimetype []MimeType) string {
 	mt := []string{}
 
 	for _, m := range mimetype {
-		lo := []string{m.Type, m.Subtype}
+		lo := []string{m.mType, m.mSubtype}
 		mt = append(mt, strings.Join(lo, "/"))
 	}
 	return strings.Join(mt, ",")
