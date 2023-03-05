@@ -15,15 +15,39 @@ const (
 )
 
 type GeneralHeader struct {
-	Pragma       string
-	CacheControl string
-	Connection   string
+	pragma       string
+	cacheControl string
+	connection   string
 }
 
-func (gh *GeneralHeader) New() {
-	gh.Pragma = NO_STORE
-	gh.CacheControl = NO_STORE
-	gh.Connection = CLOSE
+func (gh *GeneralHeader) Pragma() string {
+	return gh.pragma
+}
+
+func (gh *GeneralHeader) CacheControl() string {
+	return gh.cacheControl
+}
+
+func (gh *GeneralHeader) Connection() string {
+	return gh.connection
+}
+
+func (gh *GeneralHeader) SetPragma(pragma string) {
+	gh.pragma = pragma
+}
+
+func (gh *GeneralHeader) SetCacheControl(cachecontrol string) {
+	gh.cacheControl = cachecontrol
+}
+
+func (gh *GeneralHeader) SetConnection(connection string) {
+	gh.connection = connection
+}
+
+func (gh *GeneralHeader) Init() {
+	gh.pragma = NO_STORE
+	gh.cacheControl = NO_STORE
+	gh.connection = CLOSE
 }
 
 const (
@@ -48,26 +72,74 @@ const (
 var user_agent = "Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion"
 
 type RequestHeader struct {
-	Accept        string
-	AcceptCharset string
-	From          string
-	Referer       string
-	UserAgent     string
-	Authorization string
+	accept        string
+	acceptCharset string
+	from          string
+	referer       string
+	userAgent     string
+	authorization string
 }
 
-func (rqh *RequestHeader) New() {
+func (rqh *RequestHeader) Accept() string {
+	return rqh.accept
+}
+
+func (rqh *RequestHeader) AcceptCharset() string {
+	return rqh.acceptCharset
+}
+
+func (rqh *RequestHeader) From() string {
+	return rqh.from
+}
+
+func (rqh *RequestHeader) Referer() string {
+	return rqh.referer
+}
+
+func (rqh *RequestHeader) UserAgent() string {
+	return rqh.userAgent
+}
+
+func (rqh *RequestHeader) Authorization() string {
+	return rqh.authorization
+}
+
+func (rqh *RequestHeader) SetAccept(accept string) {
+	rqh.accept = accept
+}
+
+func (rqh *RequestHeader) SetAcceptCharset(acceptcharset string) {
+	rqh.acceptCharset = acceptcharset
+}
+
+func (rqh *RequestHeader) SetFrom(from string) {
+	rqh.from = from
+}
+
+func (rqh *RequestHeader) SetReferer(referer string) {
+	rqh.referer = referer
+}
+
+func (rqh *RequestHeader) SetUserAgent(useragent string) {
+	rqh.userAgent = useragent
+}
+
+func (rqh *RequestHeader) SetAuthorization(authorization string) {
+	rqh.authorization = authorization
+}
+
+func (rqh *RequestHeader) Init() {
 	mt := []mimeType{
 		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_PLAIN},
 		{Type: MIME_TYPE_APPLICATION, Subtype: MIME_SUBTYPE_JSON},
 		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_HTML},
 		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_CSV},
 	}
-	rqh.Accept = rqh.CreateAccept(mt)
-	rqh.AcceptCharset = UTF8
-	rqh.From = ""
-	rqh.Referer = ""
-	rqh.UserAgent = user_agent
+	rqh.accept = rqh.CreateAccept(mt)
+	rqh.acceptCharset = UTF8
+	rqh.from = ""
+	rqh.referer = ""
+	rqh.userAgent = user_agent
 }
 
 type mimeType struct {
