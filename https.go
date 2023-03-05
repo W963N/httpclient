@@ -114,7 +114,7 @@ func (hget *HttpsGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, erro
 	if u.Scheme != "https" {
 		return nil, errors.New("Scheme Format error")
 	}
-	geturl = u.Scheme + "://" + u.Host + u.Path
+	geturl = u.Scheme + "://" + u.Host + u.Path + "?" + u.RawQuery
 
 	req, err := http.NewRequest("GET", geturl, nil)
 	if err != nil {
