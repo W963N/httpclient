@@ -1,4 +1,4 @@
-package main
+package httpclient
 
 import (
 	"io/ioutil"
@@ -18,7 +18,7 @@ type httpGet struct {
 	StatusCode int
 }
 
-func (hget *httpGet) Request(gh generalHeader, rqh requestHeader) ([]byte, error) {
+func (hget *httpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
 	req, err := http.NewRequest("GET", hget.url, nil)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (hget *httpGet) Request(gh generalHeader, rqh requestHeader) ([]byte, error
 	return byteArray, nil
 }
 
-func (hget *httpGet) createReqHeader(gh generalHeader, rqh requestHeader) {
+func (hget *httpGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
 	hget.request.Header.Set(PRAGMA, gh.Pragma)
 	hget.request.Header.Set(CONNECTION, gh.Connection)
 	hget.request.Header.Set(CACHE_CONTROL, gh.CacheControl)

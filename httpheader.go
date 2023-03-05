@@ -1,4 +1,4 @@
-package main
+package httpclient
 
 import "strings"
 
@@ -14,13 +14,13 @@ const (
 	CLOSE    = "close"
 )
 
-type generalHeader struct {
+type GeneralHeader struct {
 	Pragma       string
 	CacheControl string
 	Connection   string
 }
 
-func (gh *generalHeader) New() {
+func (gh *GeneralHeader) New() {
 	gh.Pragma = NO_STORE
 	gh.CacheControl = NO_STORE
 	gh.Connection = CLOSE
@@ -47,7 +47,7 @@ const (
 
 var user_agent = "Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion"
 
-type requestHeader struct {
+type RequestHeader struct {
 	Accept        string
 	AcceptCharset string
 	From          string
@@ -56,7 +56,7 @@ type requestHeader struct {
 	Authorization string
 }
 
-func (rqh *requestHeader) New() {
+func (rqh *RequestHeader) New() {
 	mt := []mimeType{
 		{Type: MIME_TYPE_TEXT, Subtype: MIME_SUBTYPE_PLAIN},
 		{Type: MIME_TYPE_APPLICATION, Subtype: MIME_SUBTYPE_JSON},
@@ -75,7 +75,7 @@ type mimeType struct {
 	Subtype string
 }
 
-func (rqh *requestHeader) CreateAccept(mimetype []mimeType) string {
+func (rqh *RequestHeader) CreateAccept(mimetype []mimeType) string {
 	mt := []string{}
 
 	for _, m := range mimetype {
