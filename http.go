@@ -1,7 +1,6 @@
 package httpclient
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -65,7 +64,6 @@ func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error
 	} else {
 		geturl = hget.url + "?" + hget.query.Encode()
 	}
-	fmt.Println(geturl)
 
 	req, err := http.NewRequest("GET", geturl, nil)
 	if err != nil {
