@@ -1,8 +1,10 @@
 package httpclient
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -13,6 +15,7 @@ type client interface {
 
 type HttpGet struct {
 	url     string
+	query   url.Values
 	request *http.Request
 
 	status     string
@@ -21,8 +24,9 @@ type HttpGet struct {
 	duration time.Duration
 }
 
-func (hget *HttpGet) Init(url string, duration time.Duration) {
+func (hget *HttpGet) Init(url string, duration time.Duration, query url.Values) {
 	hget.url = url
+	hget.query = query
 	hget.duration = duration
 }
 
@@ -46,12 +50,24 @@ func (hget *HttpGet) SetUrl(url string) {
 	hget.url = url
 }
 
+func (hget *HttpGet) SetQuery(query url.Values) {
+	hget.query = query
+}
+
 func (hget *HttpGet) SetDuration(duration time.Duration) {
 	hget.duration = duration
 }
 
 func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
-	req, err := http.NewRequest("GET", hget.url, nil)
+	geturl := ""
+	if hget.query.Encode() == "" {
+		geturl = hget.url
+	} else {
+		geturl = hget.url + "?" + hget.query.Encode()
+	}
+	fmt.Println(geturl)
+
+	req, err := http.NewRequest("GET", geturl, nil)
 	if err != nil {
 		return nil, err
 	}
