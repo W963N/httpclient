@@ -10,7 +10,7 @@ type client interface {
 	createReqHeader()
 }
 
-type httpGet struct {
+type HttpGet struct {
 	url     string
 	request *http.Request
 
@@ -18,7 +18,7 @@ type httpGet struct {
 	StatusCode int
 }
 
-func (hget *httpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
+func (hget *HttpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error) {
 	req, err := http.NewRequest("GET", hget.url, nil)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (hget *httpGet) Request(gh GeneralHeader, rqh RequestHeader) ([]byte, error
 	return byteArray, nil
 }
 
-func (hget *httpGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
+func (hget *HttpGet) createReqHeader(gh GeneralHeader, rqh RequestHeader) {
 	hget.request.Header.Set(PRAGMA, gh.Pragma)
 	hget.request.Header.Set(CONNECTION, gh.Connection)
 	hget.request.Header.Set(CACHE_CONTROL, gh.CacheControl)
