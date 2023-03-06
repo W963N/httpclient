@@ -2,7 +2,6 @@ package httpclient
 
 import (
 	"crypto/rand"
-	"fmt"
 	"math/big"
 	"strings"
 )
@@ -163,7 +162,6 @@ func (rqh *RequestHeader) Init() error {
 		return err
 	}
 	rqh.userAgent = user_agent[n.Uint64()]
-	fmt.Println(rqh.userAgent)
 
 	return nil
 }
