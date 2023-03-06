@@ -1,6 +1,11 @@
 package httpclient
 
-import "strings"
+import (
+	"crypto/rand"
+	"fmt"
+	"math/big"
+	"strings"
+)
 
 const (
 	PRAGMA        = "Pragma"
@@ -72,8 +77,6 @@ const (
 	MIME_SUBTYPE_JS         = "javascript"
 )
 
-var user_agent = "Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/firefoxversion"
-
 type RequestHeader struct {
 	accept        string
 	acceptCharset string
@@ -140,7 +143,7 @@ func (rqh *RequestHeader) SetAuthorization(authorization string) {
 	rqh.authorization = authorization
 }
 
-func (rqh *RequestHeader) Init() {
+func (rqh *RequestHeader) Init() error {
 	mt := []MimeType{
 		{mType: MIME_TYPE_TEXT, mSubtype: MIME_SUBTYPE_PLAIN},
 		{mType: MIME_TYPE_APPLICATION, mSubtype: MIME_SUBTYPE_JSON},
@@ -155,7 +158,14 @@ func (rqh *RequestHeader) Init() {
 	rqh.contentType = rqh.createMimetype([]MimeType{
 		{mType: MIME_TYPE_APPLICATION, mSubtype: MIME_SUBTYPE_URLENCODED},
 	})
-	rqh.userAgent = user_agent
+	n, err := rand.Int(rand.Reader, big.NewInt(1000))
+	if err != nil {
+		return err
+	}
+	rqh.userAgent = user_agent[n.Uint64()]
+	fmt.Println(rqh.userAgent)
+
+	return nil
 }
 
 type MimeType struct {
